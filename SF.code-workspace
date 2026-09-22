@@ -1,0 +1,39 @@
+{
+  "folders": [
+    {
+      "name": "SFBE",
+      "path": "../SFBE"
+    },
+    {
+      "name": "SFFE",
+      "path": "../SFFE"
+    },
+    {
+      "name": "workspace",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/bin": true,
+      "**/obj": true,
+      "**/build": true,
+      "**/.vs": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/bin": true,
+      "**/obj": true,
+      "**/build": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-dotnettools.csharp",
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "bradlc.vscode-tailwindcss"
+    ]
+  }
+}

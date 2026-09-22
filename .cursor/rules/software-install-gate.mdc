@@ -1,0 +1,30 @@
+---
+description: Require check + user approval before install/uninstall of any software or tools
+alwaysApply: true
+---
+
+# Software install / uninstall gate
+
+Before **installing, upgrading, or uninstalling** anything on the machine (packages, runtimes, DBs, Docker images used as local servers, winget/choco/msi/exe, global `dotnet tool` / npm `-g`, WSL distros, services):
+
+1. **Check if already installed** (service, `Get-Command`, install path, `winget list`, `docker images`, etc.).
+2. **Check version** and report it to the user.
+3. **Ask the user and wait for explicit approval** before running install/uninstall/upgrade.
+
+## Do
+
+- Prefer software the user already has (e.g. existing PostgreSQL) over installing another major version.
+- If a tool is missing, propose options and wait — do not auto-install in the background.
+
+## Do not
+
+- ❌ `winget install` / silent setup / background download without approval
+- ❌ Install a second copy (e.g. PostgreSQL 17 when 18 is already running)
+- ❌ Uninstall or Stop-Process on installers the user did not ask to kill (unless they request it)
+
+## Example
+
+```text
+❌ BAD: Docker broken → winget install PostgreSQL.17 without asking
+✅ GOOD: "PostgreSQL 18 is Running. Need password/conn string — or approve using Docker after WSL?"
+```

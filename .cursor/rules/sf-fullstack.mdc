@@ -1,0 +1,37 @@
+---
+description: SF fullstack — FE (React) + BE (.NET), hub in workspace/
+alwaysApply: true
+---
+
+# SF Fullstack
+
+## Layout (D:\Projects\SF)
+
+- `FE/` — Frontend (React 18, Vite, Redux). Legacy folder: `SFUI/` (same content via junction).
+- `BE/` — Backend (.NET 8→10, Clean Architecture). Legacy folder: `SFWeb/`.
+- `workspace/` — Docs, API map, scripts, this rule. **Open `SF.code-workspace` here.**
+
+## Ports (local)
+
+- FE: http://localhost:5173
+- BE: http://localhost:5272 — Swagger: /swagger
+
+## Rules
+
+1. **Backend first:** API + DB → Swagger → FE services → UI.
+2. **Contract:** `workspace/docs/API-MAP.md`; Swagger is source of truth.
+3. **No microservices** — modular monolith in BE.
+4. **No hardcoded prod URLs** — `VITE_API_PREFIX` (FE), secrets (BE).
+5. **Target stack:** PostgreSQL, .NET 10 LTS, Linux nginx.
+
+## Paths
+
+| Layer | Edit here |
+|-------|-----------|
+| FE services | `FE/src/services/` |
+| FE views | `FE/src/views/` |
+| BE API | `BE/src/Web.API/Controllers/` |
+| BE handlers | `BE/src/Web.Application/` |
+| BE EF/repos | `BE/src/Web.Infrastructure/` |
+
+Fullstack tasks: read both FE and BE. Update `workspace/docs/API-MAP.md` when endpoints change.

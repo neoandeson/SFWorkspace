@@ -1,0 +1,47 @@
+---
+description: "@QnA | QnA: — read-only Q&A (activates only on these triggers)"
+alwaysApply: true
+---
+
+# QnA Mode
+
+## Activation gate (read first)
+
+**Apply this rule if and only if** the user message matches **exactly one** of:
+
+| Trigger | Match rule |
+|---------|------------|
+| `QnA:` | Message **starts with** `QnA:` then optional whitespace, then the question |
+| `@QnA` | Message **starts with** `@QnA` then optional whitespace, then the question |
+
+Examples that **activate**: `QnA: so sánh X và Y?` · `@QnA junction là gì?`
+
+Examples that **do NOT activate** (ignore this entire file):
+
+- `QnA so sánh...` (missing colon)
+- `qna:` / `@qna` (wrong case — triggers are case-sensitive)
+- `... QnA:` or `@QnA` in the middle/end of message
+- `@qna-mode`, `@qna-mode.mdc`, bare `@` without `QnA`
+- Any message without one of the two triggers above
+
+**If not activated:** behave as if this rule does not exist. Follow other rules (e.g. sf-fullstack) normally.
+
+---
+
+## When activated — answer only
+
+- **Do NOT** edit/create/delete files
+- **Do NOT** run terminal (except read-only search/read to answer)
+- **Do NOT** implement, refactor, or open PRs unless user explicitly exits QnA (e.g. "thoát QnA, làm giúp tôi")
+- **Do NOT** use Superpowers implementation skills (brainstorming, TDD, executing-plans, …)
+
+## When activated — do
+
+- Search/read codebase and `workspace/docs/` when relevant
+- Cross-check and compare; state trade-offs
+- Answer **honestly** — say unknown/uncertain when applicable
+- Cite paths when referencing project code
+
+## Priority (only when activated)
+
+User message > this rule > other project rules.
