@@ -39,15 +39,17 @@ docker compose up -d --build
 - FE: http://localhost (`VITE_API_PREFIX=/`, nginx proxies `/api`)
 - API Swagger: http://localhost:8080/swagger
 - Docker Postgres on host port **5433** (native PG 18 stays on 5432)
-- API secrets/CORS come from `SFBE/.env` (`env_file`), not from committed secrets for Docker/Dokploy
+- API secrets/CORS come from `SFBE/.env` (`env_file`), not from committed secrets
 
 ## Feature mới
 
-1. BE: endpoint + handler + migration (nếu cần)
+1. BE: endpoint + handler + **EF migration** (nếu đổi schema)
 2. Test Swagger
 3. Cập nhật `workspace/docs/API-MAP.md`
 4. FE: `src/services/` → UI
 5. Test E2E
+
+Schema deploy rules: [DEPLOY-NGINX-DOCKER.md](./DEPLOY-NGINX-DOCKER.md#database-schema-migrations).
 
 ## Git
 
@@ -69,8 +71,10 @@ docker compose up -d --build
 | 2 | BE → PostgreSQL ✓ (Phase A) |
 | 2b | Docker BE+FE ✓ (Phase B) |
 | 3 | Config/secrets/CORS ✓ (Phase C) |
-| 4 | Dokploy / Hostinger (Phase D) |
+| 4 | **VPS: nginx + Docker deploy** (Phase D) — see [DEPLOY-NGINX-DOCKER.md](./DEPLOY-NGINX-DOCKER.md) |
 | 5 | .NET 10 + cleanup (Phase E) |
+
+Optional: Dokploy as an alternative PaaS UI instead of hand-rolled nginx/CI — not the default path.
 
 ## Legacy folders
 

@@ -42,6 +42,7 @@ Or see [docs/WORKFLOW.md](docs/WORKFLOW.md) (native + Docker).
 - [ARCHITECTURE](docs/ARCHITECTURE.md)
 - [API-MAP](docs/API-MAP.md)
 - [WORKFLOW](docs/WORKFLOW.md)
+- [DEPLOY nginx + Docker](docs/DEPLOY-NGINX-DOCKER.md) — VPS, CI/CD, EF migrations
 
 ## Scope
 

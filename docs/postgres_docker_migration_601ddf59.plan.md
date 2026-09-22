@@ -1,18 +1,18 @@
 ---
 name: Postgres Docker Migration
-overview: Chuyển BE từ SQL Server sang PostgreSQL (giữ EF schema + seed tối thiểu), thêm Docker cho người mới bắt đầu, rồi deploy qua Dokploy trên Hostinger — làm theo phase, bắt đầu từ DB rồi Docker.
+overview: Chuyển BE từ SQL Server sang PostgreSQL (giữ EF schema + seed tối thiểu), thêm Docker, rồi deploy VPS bằng nginx + Docker Compose (Hostinger). Dokploy chỉ là option thay thế.
 todos:
   - id: phase-a-npgsql
     content: "Phase A: Đổi EF SqlServer → Npgsql, reset migrations Postgres, seed tối thiểu, smoke test Swagger"
-    status: in_progress
+    status: completed
   - id: phase-b-docker
     content: "Phase B: Dockerfile BE + compose api/db; Dockerfile FE + nginx SPA; .dockerignore"
     status: completed
   - id: phase-c-config
     content: "Phase C: Secrets qua env, CORS domain FE, cập nhật .env.example / docs"
-    status: pending
-  - id: phase-d-dokploy
-    content: "Phase D: Deploy Dokploy trên Hostinger (Postgres + BE + FE + SSL + Google origins)"
+    status: completed
+  - id: phase-d-nginx-docker
+    content: "Phase D: Deploy VPS nginx + Docker (Postgres + BE + FE + SSL + Google origins + CI/CD migrate)"
     status: pending
   - id: phase-e-later
     content: "Phase E (sau): .NET 10, Blob/nginx tinh chỉnh, dọn legacy Restaurant nếu cần"
@@ -20,13 +20,17 @@ todos:
 isProject: false
 ---
 
-# Kế hoạch: PostgreSQL + Docker (Dokploy)
+# Kế hoạch: PostgreSQL + Docker + nginx (VPS)
 
 **Quyết định đã chốt:** Data = option C (giữ schema EF + seed một phần, không migrate full production). Azure Blob tạm **giữ nguyên** (chỉ đổi DB + host). .NET 10 để phase sau (đúng `[WORKFLOW.md](d:\Projects\SF\workspace\docs\WORKFLOW.md)`).
 
+**Deploy mặc định:** Ubuntu VPS + **Docker Compose** + **nginx host** (TLS/Certbot). Chi tiết CI/CD và schema: `[DEPLOY-NGINX-DOCKER.md](d:\Projects\SF\workspace\docs\DEPLOY-NGINX-DOCKER.md)`.
+
+Optional: tham khảo thêm Dokploy như một option thay thế (PaaS UI + Traefik) nếu muốn ít cấu hình tay.
+
 ---
 
-## 1) Backend: switch SQL Server → PostgreSQLl
+## 1) Backend: switch SQL Server → PostgreSQL
 
 ### Kết luận
 
@@ -97,9 +101,9 @@ flowchart LR
 
 ### Nguyên tắc
 
-- **Mỗi service một Dockerfile** (BE image riêng, FE image riêng). Dễ build, dễ deploy Dokploy.
+- **Mỗi service một Dockerfile** (BE image riêng, FE image riêng). Dễ build, dễ deploy trên VPS / registry.
 - **Một `docker-compose.yml` cho local** gom Postgres + API (+ optional FE) để `docker compose up` học và test.
-- **Trên Dokploy:** thường tạo **nhiều application/service** (postgres managed hoặc compose stack). Compose local ≠ bắt buộc giống 1:1 production, nhưng cùng Dockerfile thì tái sử dụng được.
+- **Trên VPS:** compose (hoặc stack tương đương) + **nginx host** reverse proxy theo subdomain. Compose local ≠ bắt buộc giống 1:1 production, nhưng cùng Dockerfile thì tái sử dụng được.
 
 ### Đề xuất cấu trúc file
 
@@ -107,15 +111,16 @@ flowchart LR
 SFBE/
   Dockerfile                 # build Web.API
   .dockerignore
-  docker-compose.yml         # local: api + postgres (khuyến nghị đặt ở BE hoặc workspace)
+  docker-compose.yml         # local: api + postgres (+ FE)
 SFFE/
   Dockerfile                 # multi-stage: npm build → nginx serve build/
   nginx.conf                 # SPA fallback → index.html
   .dockerignore
-workspace/                   # optional: compose fullstack trỏ cả BE+FE+db
+workspace/docs/
+  DEPLOY-NGINX-DOCKER.md     # CI/CD + migration prod
 ```
 
-**Vì sao không “một Dockerfile cho cả BE+FE”:** image phình to, restart FE kéo theo API, Dokploy khó scale/log riêng. Compose **ghép** nhiều container — đó là “chung 1 file điều phối”, không phải chung 1 image.
+**Vì sao không “một Dockerfile cho cả BE+FE”:** image phình to, restart FE kéo theo API, khó scale/log riêng. Compose **ghép** nhiều container — đó là “chung 1 file điều phối”, không phải chung 1 image.
 
 ### Config / secrets (quan trọng)
 
@@ -123,27 +128,35 @@ workspace/                   # optional: compose fullstack trỏ cả BE+FE+db
 | Môi trường   | Cách                                                                                                                   |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------- |
 | Local Docker | file `.env` (gitignored) cạnh compose; compose inject vào container                                                    |
-| Dokploy      | UI Environment Variables / Secrets — **không** nhét secret vào image                                                   |
+| VPS prod     | `.env` trên server (gitignored) hoặc CI secrets inject lúc deploy — **không** nhét secret vào image                    |
 | FE           | `VITE_*` phải có **lúc `npm run build`** (build-arg). Sai = phải rebuild                                               |
 | BE           | đọc env runtime: `ConnectionStrings__CentimilDB`, `ASPNETCORE_URLS=http://+:8080`, `ASPNETCORE_ENVIRONMENT=Production` |
 
 
 Ví dụ mapping compose (ý tưởng):
 
-- Service `db`: image `postgres:16`, volume `pgdata`, port `5432`
+- Service `db`: image `postgres:16`, volume `pgdata`, port `5432` (local có thể map host `5433`)
 - Service `api`: build từ `SFBE/Dockerfile`, depends_on `db`, env connection string `Host=db;...`
 - Service `web` (optional local): build `SFFE`, nginx port 80, `VITE_API_PREFIX` trỏ URL public API
 
-**CORS:** hiện có `AllowOrigin` + TODO “remove when deploy” trong `[WebApplicationBuilderExtensions.cs](d:\Projects\SF\SFBE\src\Web.API\Extensions\WebApplicationBuilderExtensions.cs)` — production phải set origin đúng domain FE (HTTPS), không xóa CORS khi FE/API khác origin.
+**CORS:** production phải set origin đúng domain FE (HTTPS).
 
-### Dokploy trên Hostinger (phase sau Docker local)
+### Schema migrations (dev → prod)
 
-1. VPS Hostinger + cài Dokploy
-2. Postgres: service/database trong Dokploy (hoặc container trong stack)
-3. Deploy BE từ Dockerfile + env secrets
-4. Deploy FE (nginx static) + build-arg `VITE_API_PREFIX=https://api.yourdomain/`
-5. Domain + SSL (Dokploy/Traefik)
+- Dev: `dotnet ef migrations add …` → commit files trong `Web.Infrastructure/Migrations/`.
+- Prod: CD chạy `database update` (hoặc migrate step có kiểm soát) **trước** traffic bản API mới; `pg_dump` trước migrate lớn.
+- Không `docker compose down -v` trên prod.
+- Chi tiết: [DEPLOY-NGINX-DOCKER.md](d:\Projects\SF\workspace\docs\DEPLOY-NGINX-DOCKER.md#database-schema-migrations).
+
+### Phase D — nginx + Docker trên Hostinger / VPS
+
+1. VPS Ubuntu + Docker + nginx + Certbot (UFW: 22/80/443)
+2. Postgres: container trong compose, volume bền; không public `5432`
+3. Deploy BE từ Dockerfile + env secrets trên VPS
+4. Deploy FE (nginx static trong image) + build-arg `VITE_API_PREFIX=https://api.yourdomain/` (hoặc `/` nếu path proxy)
+5. Host nginx: `app.` → FE, `api.` → API; SSL Certbot
 6. Google OAuth: thêm authorized JS origin domain FE mới
+7. (Khuyến nghị) GitHub Actions: build/push images → SSH → compose pull → **migrate** → up → smoke
 
 ---
 
@@ -155,7 +168,7 @@ Ví dụ mapping compose (ý tưởng):
 | **A — Postgres local** | Đổi provider, migration mới, seed tối thiểu             | `dotnet run` + Swagger OK trên Postgres local            |
 | **B — Docker local**   | Dockerfile BE + compose `api+db`; Dockerfile FE + nginx | `docker compose up` chạy được API; FE build/serve được   |
 | **C — Config sạch**    | Secrets qua env; CORS + `.env.example` cập nhật         | Không phụ thuộc `appsettings.Development.json` trên prod |
-| **D — Dokploy**        | Deploy Hostinger                                        | HTTPS FE↔API, login JWT/Google OK                        |
+| **D — nginx + Docker** | Deploy VPS + CI/CD migrate                              | HTTPS FE↔API, login JWT/Google OK                        |
 | **E — (sau)**          | .NET 10, tối ưu Blob/nginx, dọn Restaurant legacy       | Theo roadmap WORKFLOW                                    |
 
 
@@ -171,4 +184,4 @@ Chỉ BE:
 - Hướng dẫn chạy Postgres local (compose nhỏ hoặc Docker một container)
 - Cập nhật `[ARCHITECTURE.md](d:\Projects\SF\workspace\docs\ARCHITECTURE.md)` / note trong WORKFLOW phase 2
 
-Chưa đụng FE production URL, Dokploy, hay .NET 10 trong phase A.
+Chưa đụng FE production URL, VPS nginx, hay .NET 10 trong phase A.

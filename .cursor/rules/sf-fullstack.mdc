@@ -22,7 +22,7 @@ alwaysApply: true
 2. **Contract:** `workspace/docs/API-MAP.md`; Swagger is source of truth.
 3. **No microservices** — modular monolith in BE.
 4. **No hardcoded prod URLs** — `VITE_API_PREFIX` (FE), secrets (BE).
-5. **Target stack:** PostgreSQL, .NET 10 LTS, Linux nginx.
+5. **Target stack:** PostgreSQL, .NET 10 LTS, Linux **nginx + Docker** deploy (see `workspace/docs/DEPLOY-NGINX-DOCKER.md`). Dokploy is an optional alternative only.
 
 ## Paths
 

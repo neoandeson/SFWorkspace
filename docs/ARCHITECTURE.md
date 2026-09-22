@@ -3,19 +3,22 @@
 ## Overview
 
 ```
-FE (React/Vite)  ──REST──▶  BE (.NET API)  ──▶  PostgreSQL (target)
+FE (React/Vite)  ──REST──▶  BE (.NET API)  ──▶  PostgreSQL
      │                           │
      └─ static build             └─ Kestrel
             │                          │
-            └──────── nginx (Linux VPS) ────────┘
+            └──── nginx (Linux VPS edge :80/:443) ────┘
 ```
+
+Production: **Docker Compose** runs FE / API / Postgres; **nginx on the host** terminates TLS and reverse-proxies by subdomain (or path).  
+Optional alternative: [Dokploy](https://dokploy.com/) (PaaS UI + Traefik) if you prefer less manual nginx/CI setup.
 
 ## Folders
 
 | Path | Role |
 |------|------|
-| `FE/` | Frontend repo (junction → `SFUI/`) |
-| `BE/` | Backend repo (junction → `SFWeb/`) |
+| `FE/` / `SFFE/` | Frontend repo |
+| `BE/` / `SFBE/` | Backend repo |
 | `workspace/` | Hub: docs, Cursor rules, scripts |
 
 ## BE — modular monolith
@@ -27,10 +30,21 @@ FE (React/Vite)  ──REST──▶  BE (.NET API)  ──▶  PostgreSQL (targ
 
 ## Production target
 
-- DB: **PostgreSQL** (local: `SFBE/docker-compose.yml` service `db`)
+- DB: **PostgreSQL** (Docker volume; one instance, app-specific databases as needed)
 - Runtime: .NET 8 → **.NET 10 LTS** (Phase E)
-- Host: IIS → **Linux + nginx / Dokploy**
-- FE: `npm run build` → static files
+- Host: **Linux (Ubuntu LTS) + Docker + nginx** (edge reverse proxy + Certbot SSL)
+- FE: `npm run build` → static files (often nginx inside the FE image; host nginx still fronts HTTPS)
+
+### Suggested prod topology (learning / Hostinger VPS)
+
+| App | Internal listen | Public URL (via host nginx) |
+|-----|-----------------|-----------------------------|
+| SFFE | `127.0.0.1:3001` | `https://app.example.com` |
+| SFBE | `127.0.0.1:3002` | `https://api.example.com` |
+| Postgres | Docker network `postgres:5432` only | *(no public URL)* |
+
+Do **not** expose app ports or `5432` on the public firewall. Only **22 / 80 / 443**.  
+Full CI/CD + schema migration: [DEPLOY-NGINX-DOCKER.md](./DEPLOY-NGINX-DOCKER.md).
 
 ### Local PostgreSQL (Phase A)
 
@@ -64,17 +78,17 @@ Docker DB uses host port **5433** so it does not clash with native PG 18 on 5432
 
 | Variable | Where | Purpose |
 |----------|--------|---------|
-| `ConnectionStrings__CentimilDB` | SFBE `.env` / Dokploy | Postgres connection |
-| `Cors__Origins` | SFBE `.env` / Dokploy | Comma-separated FE origins (e.g. `http://localhost:5173,http://localhost`) |
-| `JWT__Key`, `JWT__Issuer`, `JWT__Audience` | SFBE `.env` / Dokploy | JWT signing |
-| `Authentication__Google__ClientId/Secret` | SFBE `.env` / Dokploy | Google OAuth (API) |
-| `BlobStorage__*` | SFBE `.env` / Dokploy | Azure Blob (optional local) |
-| `VITE_API_PREFIX` | SFBE `.env` (compose build) / SFFE env | `/` behind nginx proxy; full URL for native Vite or public API |
+| `ConnectionStrings__CentimilDB` | SFBE `.env` / VPS env | Postgres connection |
+| `Cors__Origins` | SFBE `.env` / VPS env | Comma-separated FE origins (e.g. `http://localhost:5173,https://app.example.com`) |
+| `JWT__Key`, `JWT__Issuer`, `JWT__Audience` | SFBE `.env` / VPS env | JWT signing |
+| `Authentication__Google__ClientId/Secret` | SFBE `.env` / VPS env | Google OAuth (API) |
+| `BlobStorage__*` | SFBE `.env` / VPS env | Azure Blob (optional local) |
+| `VITE_API_PREFIX` | SFBE `.env` (compose build) / SFFE env | `/` behind nginx path proxy; full URL for native Vite or public API subdomain |
 | `VITE_GOOGLE_CLIENT_ID` | FE build env | Required at FE boot |
 
 - Native `dotnet run`: may keep using `appsettings.Development.json`.
 - Docker compose: `api` loads `SFBE/.env` via `env_file` (copy from `.env.example`).
-- Do not commit `.env`. Production (Dokploy) sets the same keys in the UI.
+- Do not commit `.env`. Production sets the same keys in a gitignored file on the VPS (or CI secrets injected at deploy).
 
 ## Principles
 
@@ -82,3 +96,4 @@ Docker DB uses host port **5433** so it does not clash with native PG 18 on 5432
 2. Env-based config
 3. Backend before frontend
 4. One workspace: `workspace/SF.code-workspace`
+5. Edge = nginx; apps = Docker; schema changes = EF migrations (see deploy doc)
