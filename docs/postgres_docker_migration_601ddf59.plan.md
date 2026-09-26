@@ -150,8 +150,8 @@ Ví dụ mapping compose (ý tưởng):
 
 ### Phase D — nginx + Docker trên Hostinger / VPS
 
-1. VPS Ubuntu + Docker + nginx + Certbot (UFW: 22/80/443)
-2. Postgres: container trong compose, volume bền; không public `5432`
+1. VPS Ubuntu + Docker + nginx + Certbot (UFW public: **80/443 only**; không mở `22` ra Internet — admin qua console/VPN)
+2. Postgres: container trong compose, volume bền; **chỉ Docker network nội bộ VPS** — không public `5432`
 3. Deploy BE từ Dockerfile + env secrets trên VPS
 4. Deploy FE (nginx static trong image) + build-arg `VITE_API_PREFIX=https://api.yourdomain/` (hoặc `/` nếu path proxy)
 5. Host nginx: `app.` → FE, `api.` → API; SSL Certbot

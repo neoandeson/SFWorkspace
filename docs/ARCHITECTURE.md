@@ -43,7 +43,7 @@ Optional alternative: [Dokploy](https://dokploy.com/) (PaaS UI + Traefik) if you
 | SFBE | `127.0.0.1:3002` | `https://api.example.com` |
 | Postgres | Docker network `postgres:5432` only | *(no public URL)* |
 
-Do **not** expose app ports or `5432` on the public firewall. Only **22 / 80 / 443**.  
+Public firewall: **only `80` / `443`**. Do **not** open SSH (`22`) or Postgres (`5432`) to the internet — DB stays on the VPS Docker network; admin via provider console or private VPN.  
 Full CI/CD + schema migration: [DEPLOY-NGINX-DOCKER.md](./DEPLOY-NGINX-DOCKER.md).
 
 ### Local PostgreSQL (Phase A)

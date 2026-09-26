@@ -20,10 +20,20 @@ Internet → :443 nginx (host)
 
 | Piece | Role |
 |-------|------|
-| **nginx (host)** | Edge reverse proxy, Certbot SSL, only public HTTP(S) |
+| **nginx (host)** | Edge reverse proxy, Certbot SSL; **only public ports `80` / `443`** |
 | **Docker Compose** | Run API, FE, Postgres; publish app ports to **localhost** only |
-| **Postgres** | One instance, volume `pgdata`; do not publish `5432` to the internet |
-| **UFW** | Allow `22`, `80`, `443` only |
+| **Postgres** | One instance, volume `pgdata`; **Docker network only** — never publish `5432` to the host public interface / internet |
+| **UFW (public)** | Allow **`80` and `443` only**. Do **not** open `22` to the world. |
+
+### Admin access (no public SSH)
+
+Prefer operating the VPS without exposing SSH:
+
+- Provider **web console / VNC** (e.g. Hostinger panel), or
+- **VPN / Tailscale / WireGuard**, or
+- SSH bound to a private interface / allowlisted IP only (never `0.0.0.0/0` on `22`)
+
+CI/CD that needs a shell should use the same private path (self-hosted runner on the VPS, Tailscale SSH, or console-triggered deploy) — not an open `22` from the internet.
 
 Extra services on the same VPS (Telegram API, trade API, …): same pattern — new internal port + new `server_name` (or path). Prefer **separate Postgres databases/users** per app on the shared instance.
 
@@ -31,10 +41,10 @@ Extra services on the same VPS (Telegram API, trade API, …): same pattern — 
 
 ## One-time VPS setup (checklist)
 
-1. Ubuntu LTS, SSH keys, UFW (`22/80/443`).
+1. Ubuntu LTS; UFW: allow **`80/tcp`**, **`443/tcp`** only (default deny incoming). Manage the box via provider console or private VPN — **do not** open `22` publicly.
 2. Install Docker Engine + Compose plugin.
 3. Install nginx + Certbot (`python3-certbot-nginx`).
-4. Clone/copy compose stack under e.g. `/opt/sf/` (SFBE compose + env file, gitignored secrets).
+4. Clone/copy compose stack under e.g. `/opt/sf/` (SFBE compose + env file, gitignored secrets). Postgres: no `ports:` to the public host (or only if needed for local debug on `127.0.0.1` — never `0.0.0.0:5432`).
 5. DNS A records: `app` / `api` → VPS IP.
 6. `docker compose up -d --build` (or pull pre-built images).
 7. nginx `server` blocks → `proxy_pass` localhost ports; set `Host`, `X-Forwarded-For`, `X-Forwarded-Proto`.
@@ -53,7 +63,7 @@ git push main
          → build Docker images (SFBE, SFFE)
          → push to registry (GHCR / Docker Hub)
     → CD (same workflow or separate)
-         → SSH to VPS
+         → reach VPS via private path (self-hosted runner / Tailscale / console — not public :22)
          → docker compose pull
          → run DB migrate (see below)
          → docker compose up -d
@@ -69,11 +79,12 @@ git push main
 | Zero-ish downtime | Pull new images → migrate → recreate API/FE containers; keep Postgres volume |
 | Rollback | Redeploy previous image tag; reverse migration only if you wrote a safe `Down` |
 | FE env | `VITE_*` baked at **image build** — wrong prefix ⇒ rebuild FE image |
+| Reachability | Do not open SSH to `0.0.0.0/0` for CD; prefer runner on the VPS or VPN |
 
 ### Minimal CD without a registry (acceptable early learning)
 
-Actions SSHs to VPS → `git pull` (or rsync) → `docker compose build && up -d` → migrate.  
-Prefer registry+pull once comfortable.
+On the VPS (console or private VPN): `git pull` (or rsync over private net) → `docker compose build && up -d` → migrate.  
+Prefer registry + pull once comfortable.
 
 ### Example job order on the VPS
 
@@ -130,9 +141,9 @@ SF uses **EF Core** migrations under `SFBE/src/Web.Infrastructure/Migrations/` (
 
 | | Local compose | Prod VPS |
 |--|---------------|----------|
-| Host port | `5433` → container `5432` (avoid clash with native PG) | Prefer **no** public publish; only Docker network |
-| Conn string | `Host=db;Port=5432;...` | Same hostname inside compose network |
-| Apply migrations | compose up + MigrateAsync / ef update | CD migrate step + verify |
+| Host port | `5433` → container `5432` (avoid clash with native PG) | **No** host publish; apps reach DB only on Docker network (`Host=db`) |
+| Conn string | `Host=db;Port=5432;...` | Same; never a public IP:`5432` |
+| Apply migrations | compose up + MigrateAsync / ef update | CD migrate step on the VPS (same Docker network) + verify |
 
 ---
 
@@ -155,5 +166,6 @@ Same-origin path proxy: FE nginx proxies `/api` → API, `VITE_API_PREFIX=/`.
 - [ ] HTTPS FE and API reachable
 - [ ] Login JWT / Google OK with prod origins
 - [ ] Postgres data survives container recreate (volume)
-- [ ] Documented way to ship a new migration via CI/CD or scripted SSH
-- [ ] UFW does not expose Postgres or raw app ports
+- [ ] Documented way to ship a new migration via CI/CD or on-box script (no public SSH required)
+- [ ] UFW public: **only `80` / `443`** — no `22`, no Postgres, no raw app ports
+- [ ] Postgres reachable only inside the VPS Docker network
