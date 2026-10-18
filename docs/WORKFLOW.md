@@ -72,7 +72,7 @@ Schema deploy rules: [DEPLOY-NGINX-DOCKER.md](./DEPLOY-NGINX-DOCKER.md#database-
 | 2b | Docker BE+FE ✓ (Phase B) |
 | 3 | Config/secrets/CORS ✓ (Phase C) |
 | 4 | **VPS: nginx + Docker deploy** (Phase D) — see [DEPLOY-NGINX-DOCKER.md](./DEPLOY-NGINX-DOCKER.md) |
-| 5 | .NET 10 + cleanup (Phase E) |
+| 5 | .NET 10 + Blob/nginx refine + Restaurant legacy cleanup (Phase E) ✓ |
 
 Optional: Dokploy as an alternative PaaS UI instead of hand-rolled nginx/CI — not the default path.
 

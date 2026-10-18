@@ -26,14 +26,14 @@ Optional alternative: [Dokploy](https://dokploy.com/) (PaaS UI + Traefik) if you
 - **Account** — JWT, Google OAuth, Identity
 - **Instrument** — search, favorites, alerts
 - **Market**, **Crypto** orders/signals
-- **Restaurant / Dishes** — legacy template (có thể xóa)
 
 ## Production target
 
 - DB: **PostgreSQL** (Docker volume; one instance, app-specific databases as needed)
-- Runtime: .NET 8 → **.NET 10 LTS** (Phase E)
+- Runtime: **.NET 10 LTS**
 - Host: **Linux (Ubuntu LTS) + Docker + nginx** (edge reverse proxy + Certbot SSL)
 - FE: `npm run build` → static files (often nginx inside the FE image; host nginx still fronts HTTPS)
+- Host nginx samples: [`deploy/nginx/`](../deploy/nginx/) and [`docs/examples/nginx-host-app-api.conf`](./examples/nginx-host-app-api.conf); prod compose: `SFBE/docker-compose.prod.yml`
 
 ### Suggested prod topology (learning / Hostinger VPS)
 
@@ -53,7 +53,7 @@ Preferred for native `dotnet run`: **PostgreSQL 18** Windows (`postgresql-x64-18
 Connection string key: `ConnectionStrings:CentimilDB`  
 Default native: `Host=localhost;Port=5432;Database=centimildb;Username=sf;Password=sf_dev_password`
 
-EF provider: `Npgsql.EntityFrameworkCore.PostgreSQL`. Migrations: `InitialPostgres`.
+EF provider: `Npgsql.EntityFrameworkCore.PostgreSQL`. Migrations: `InitialPostgres`, `DropRestaurantLegacy` (Phase E).
 
 ### Local Docker stack (Phase B)
 
@@ -82,7 +82,6 @@ Docker DB uses host port **5433** so it does not clash with native PG 18 on 5432
 | `Cors__Origins` | SFBE `.env` / VPS env | Comma-separated FE origins (e.g. `http://localhost:5173,https://app.example.com`) |
 | `JWT__Key`, `JWT__Issuer`, `JWT__Audience` | SFBE `.env` / VPS env | JWT signing |
 | `Authentication__Google__ClientId/Secret` | SFBE `.env` / VPS env | Google OAuth (API) |
-| `BlobStorage__*` | SFBE `.env` / VPS env | Azure Blob (optional local) |
 | `VITE_API_PREFIX` | SFBE `.env` (compose build) / SFFE env | `/` behind nginx path proxy; full URL for native Vite or public API subdomain |
 | `VITE_GOOGLE_CLIENT_ID` | FE build env | Required at FE boot |
 

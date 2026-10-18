@@ -153,11 +153,21 @@ Same keys as [SFBE/.env.example](../../SFBE/.env.example):
 
 - `ConnectionStrings__CentimilDB`
 - `Cors__Origins=https://app.example.com`
-- `JWT__*`, Google, Blob as needed
+- `JWT__*`, Google OAuth as needed
 - FE build-args: `VITE_API_PREFIX`, `VITE_GOOGLE_CLIENT_ID`
 
 Subdomain split (recommended): `VITE_API_PREFIX=https://api.example.com/` + CORS includes `https://app.example.com`.  
 Same-origin path proxy: FE nginx proxies `/api` → API, `VITE_API_PREFIX=/`.
+
+### Prod compose + host nginx artifacts
+
+| Artifact | Path |
+|----------|------|
+| Local learning compose | `SFBE/docker-compose.yml` (FE `:80`, API `:8080`, DB host `:5433`) |
+| Prod-oriented compose | `SFBE/docker-compose.prod.yml` — FE/API bound to `127.0.0.1:3001` / `:3002`; Postgres **no** host publish |
+| Host nginx vhosts | [`deploy/nginx/`](../deploy/nginx/) (`sf-app.conf` / `sf-api.conf`) or combined [`examples/nginx-host-app-api.conf`](./examples/nginx-host-app-api.conf) |
+
+Runtime: **.NET 10** API image (`SFBE/Dockerfile`). Azure Blob was removed with the Restaurant logo feature; re-add only if a new upload use-case needs it. EF migration `DropRestaurantLegacy` drops `Restaurants` / `Dishes` tables.
 
 ---
 

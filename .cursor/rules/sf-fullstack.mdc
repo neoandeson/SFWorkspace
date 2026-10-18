@@ -8,7 +8,7 @@ alwaysApply: true
 ## Layout (D:\Projects\SF)
 
 - `FE/` — Frontend (React 18, Vite, Redux). Legacy folder: `SFUI/` (same content via junction).
-- `BE/` — Backend (.NET 8→10, Clean Architecture). Legacy folder: `SFWeb/`.
+- `BE/` — Backend (.NET 10 LTS, Clean Architecture). Legacy folder: `SFWeb/`.
 - `workspace/` — Docs, API map, scripts, this rule. **Open `SF.code-workspace` here.**
 
 ## Ports (local)

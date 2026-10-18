@@ -29,12 +29,6 @@ Legacy prod: `http://115.165.166.146/port1/`
 | `apiGetWalletData` | GET | `crypto/wallets` |
 | `apiGetTransctionHistoryData` | POST | `crypto/wallets/history` |
 
-## Restaurant — `FE/src/services/RestaurantService.ts`
-
-| FE | Method | BE path |
-|----|--------|---------|
-| `apiGetSampleDish` | GET | `restaurants/get-sample-dish` |
-
 ## Auth header
 
 `Authorization: Bearer <token>` — `FE/src/services/BaseService.ts`
