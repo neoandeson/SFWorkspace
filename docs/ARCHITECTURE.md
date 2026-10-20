@@ -10,8 +10,8 @@ FE (React/Vite)  ──REST──▶  BE (.NET API)  ──▶  PostgreSQL
             └──── nginx (Linux VPS edge :80/:443) ────┘
 ```
 
-Production: **Docker Compose** runs FE / API / Postgres; **nginx on the host** terminates TLS and reverse-proxies by subdomain (or path).  
-Optional alternative: [Dokploy](https://dokploy.com/) (PaaS UI + Traefik) if you prefer less manual nginx/CI setup.
+Production: **Docker Compose** runs FE / API; **shared Postgres** on the VPS Docker network (not published publicly); **nginx on the host** terminates TLS and reverse-proxies by subdomain (or path).  
+VPS DB setup notes: [POSTGRES-VPS.md](./POSTGRES-VPS.md). Optional alternative: [Dokploy](https://dokploy.com/) (PaaS UI + Traefik).
 
 ## Folders
 
@@ -41,7 +41,7 @@ Optional alternative: [Dokploy](https://dokploy.com/) (PaaS UI + Traefik) if you
 |-----|-----------------|-----------------------------|
 | SFFE | `127.0.0.1:3001` | `https://app.example.com` |
 | SFBE | `127.0.0.1:3002` | `https://api.example.com` |
-| Postgres | Docker network `postgres:5432` only | *(no public URL)* |
+| Postgres | Shared instance (e.g. `postgresql-ci6n`), Docker network only — see [POSTGRES-VPS.md](./POSTGRES-VPS.md) | *(no public URL)* |
 
 Public firewall: **only `80` / `443`**. Do **not** open SSH (`22`) or Postgres (`5432`) to the internet — DB stays on the VPS Docker network; admin via provider console or private VPN.  
 Full CI/CD + schema migration: [DEPLOY-NGINX-DOCKER.md](./DEPLOY-NGINX-DOCKER.md).
