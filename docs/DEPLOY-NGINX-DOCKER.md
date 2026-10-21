@@ -15,8 +15,11 @@ Internet → :443 nginx (host)
               ├── app.example.com  → 127.0.0.1:3001  (SFFE)
               └── api.example.com  → 127.0.0.1:3002  (SFBE)
                      │
-                     └── Docker network → postgres:5432  (db_sf / centimildb)
+                     ├── Docker network → postgres:5432
+                     └── Docker network → sf-telegram:3003  (alerts; not public)
 ```
+
+Telegram sidecar (`TelegramTranmission`): clone to `/opt/sf/TelegramTranmission`, set `TELEGRAM_*` in SFBE `.env`, compose builds service `sf-telegram`. API uses `TELEGRAM_BotSendMessage_URL=http://sf-telegram:3003/sendMsg`. Do **not** put `/sendMsg` on nginx. See repo `TelegramTranmission/README.md`.
 
 | Piece | Role |
 |-------|------|
@@ -155,6 +158,7 @@ Same keys as [SFBE/.env.example](../../SFBE/.env.example):
 - `Cors__Origins=https://app.example.com`
 - `JWT__*`, Google OAuth as needed
 - FE build-args: `VITE_API_PREFIX`, `VITE_GOOGLE_CLIENT_ID`
+- Telegram: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_APPKEY`, `TELEGRAM_ID`, `TELEGRAM_BotSendMessage_URL`, optional `TELEGRAM_CONTEXT`
 
 Subdomain split (recommended): `VITE_API_PREFIX=https://api.example.com/` + CORS includes `https://app.example.com`.  
 Same-origin path proxy: FE nginx proxies `/api` → API, `VITE_API_PREFIX=/`.
