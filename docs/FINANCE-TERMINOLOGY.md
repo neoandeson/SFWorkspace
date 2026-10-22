@@ -31,13 +31,15 @@ Excel personal labels are mapped here so UI/API/docs stay consistent and profess
 | **Margin** | Interest earned | `TotalInterest` | **Tổng lãi** | **Margin** |
 | **%Margin** | Interest ÷ principal | `YieldPercent` | **Tỷ suất lãi** (%) | **%Margin** |
 
-### Formulas (simple interest, as in Excel)
+### Formulas (simple interest by term — ladder design)
 
-- `ExpectedInterest = Principal × (AnnualRatePercent / 100) × (TermMonths / 12)`  
-  *(If Excel used `Principal × rate` for a full 12-month term only, document that variant explicitly in the ladder spec when rates are confirmed.)*
+- `ExpectedInterest = Principal × (AnnualRatePercent / 100) × (TermMonths / 12)`
 - `MaturityAmount = Principal + ExpectedInterest`
-- `TotalInterest = TotalMaturityAmount − TotalPrincipal`
-- `YieldPercent = TotalInterest / TotalPrincipal × 100` (0 if principal is 0)
+- `TotalExpectedInterest` (UI: Tổng lãi dự tính) = sum of `ExpectedInterest` for the filtered set (usually Open)
+- `TotalInterest` may equal `TotalExpectedInterest` for Open ladders; realized interest after close can be refined later
+- `YieldPercent = TotalExpectedInterest / TotalPrincipal × 100` (0 if principal is 0)
+
+Legacy Excel often used `Principal × rate` for ~12-month rows only; SF uses the pro-rata formula above.
 
 ## Why not “margin”?
 
