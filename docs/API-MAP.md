@@ -34,11 +34,22 @@ Legacy prod: `http://115.165.166.146/port1/`
 | FE | Method | BE path |
 |----|--------|---------|
 | `apiGetFinanceAccounts` | GET | `api/finance/accounts` |
-| `apiCreateFinanceAccount` | POST | `api/finance/accounts` |
-| `apiUpdateFinanceAccount` | PUT | `api/finance/accounts/{id}` |
+| `apiCreateFinanceAccount` | POST | `api/finance/accounts` (body may include `instrumentId`) |
+| `apiUpdateFinanceAccount` | PUT | `api/finance/accounts/{id}` (body may include `instrumentId`) |
 | `apiArchiveFinanceAccount` | DELETE | `api/finance/accounts/{id}` |
 | `apiGetAccountSnapshots` | GET | `api/finance/accounts/{id}/snapshots` |
 | `apiGetFinanceSummary` | GET | `api/finance/summary` |
+
+## Finance portfolio / settings — `FinanceService.ts` → `FinancePortfolioController` / `FinanceSettingsController`
+
+| FE | Method | BE path |
+|----|--------|---------|
+| `apiGetFinanceSettings` | GET | `api/finance/settings` |
+| `apiPutUsdVndRate` | PUT | `api/finance/settings/usd-vnd-rate` body `{ rate }` |
+| `apiMarkPortfolio` | POST | `api/finance/portfolio/mark` |
+| `apiGetPortfolioHistory` | GET | `api/finance/portfolio/history?from=&to=` (`DateOnly`, daily forward-fill) |
+
+Mark-to-market runs on Portfolio view mount only — not on Instrument patch.
 
 ## Finance Term Deposits — `FE/src/services/FinanceService.ts` → `TermDepositsController`
 

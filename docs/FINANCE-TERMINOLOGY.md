@@ -9,11 +9,25 @@ Excel personal labels are mapped here so UI/API/docs stay consistent and profess
 |---------|-----------------|---------|--------|
 | Account name | `Name` | Tên tài khoản | — |
 | Asset type | `Type` (`Cash`, `TermSaving`, …) | Loại | — |
+| Linked screener row | `InstrumentId` | Instrument | — |
 | Native currency | `Currency` | Tiền tệ | — |
-| Balance in native currency | `Balance` | Số dư | — |
-| FX to VND | `FxRateToVnd` | Tỷ giá → VND | — |
+| Balance / quantity | `Balance` | Số dư (cash) / **Số lượng** (khi có Instrument) | — |
+| FX to VND (manual / derived) | `FxRateToVnd` | Tỷ giá → VND | — |
 | Value in VND | `ValueVnd` | Giá trị (VND) | — |
-| Portfolio sum (non-archived) | `TotalVnd` | **Tổng** | — |
+| Portfolio sum (non-archived) | `TotalVnd` | **Tổng** (VND) | — |
+
+## Portfolio mark-to-market (Feature 3)
+
+| Concept | Code / API (EN) | UI (VI) | Notes |
+|---------|-----------------|---------|--------|
+| Global USD→VND rate | `UsdVndRate` (`Finance.UsdVndRate`) | Tỷ giá USD→VND | Setting CRUD |
+| Unit price from screener | `UnitPrice` | Giá | `Instrument.Price` at mark |
+| Quote currency | `QuoteCurrency` | `USD` / `VND` | CK VN → VND; crypto/khác → USD |
+| Native value | `ValueNative` | Giá trị (native) | `Balance × UnitPrice` when linked |
+| Portfolio total USD | `TotalUsd` | **Tổng (USD)** | Format `$` + `en-US` |
+| Portfolio total VND | `TotalVnd` | **Tổng (VND)** | `TotalUsd × UsdVndRate`; format `đ` + `vi-VN` |
+
+Mark runs when user opens Portfolio — not on every Instrument patch.
 
 ## Ladder / term deposit (next phases)
 
