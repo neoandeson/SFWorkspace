@@ -40,6 +40,18 @@ Legacy prod: `http://115.165.166.146/port1/`
 | `apiGetAccountSnapshots` | GET | `api/finance/accounts/{id}/snapshots` |
 | `apiGetFinanceSummary` | GET | `api/finance/summary` |
 
+## Finance Term Deposits — `FE/src/services/FinanceService.ts` → `TermDepositsController`
+
+| FE | Method | BE path |
+|----|--------|---------|
+| `apiGetTermDepositsByAccount` | GET | `api/finance/accounts/{accountId}/deposits` |
+| `apiCreateTermDeposit` | POST | `api/finance/accounts/{accountId}/deposits` |
+| `apiUpdateTermDeposit` | PUT | `api/finance/deposits/{id}` |
+| `apiCloseTermDeposit` | POST | `api/finance/deposits/{id}/close` |
+| `apiRenewTermDeposit` | POST | `api/finance/deposits/{id}/renew` |
+| `apiGetTermDeposits` | GET | `api/finance/deposits` |
+| `apiGetTermDepositSummary` | GET | `api/finance/accounts/{accountId}/deposits/summary` |
+
 ## Auth header
 
 `Authorization: Bearer <token>` — `FE/src/services/BaseService.ts`
