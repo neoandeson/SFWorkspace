@@ -29,6 +29,17 @@ Legacy prod: `http://115.165.166.146/port1/`
 | `apiGetWalletData` | GET | `crypto/wallets` |
 | `apiGetTransctionHistoryData` | POST | `crypto/wallets/history` |
 
+## Finance — `FE/src/services/FinanceService.ts` → `FinanceAccountsController`
+
+| FE | Method | BE path |
+|----|--------|---------|
+| `apiGetFinanceAccounts` | GET | `api/finance/accounts` |
+| `apiCreateFinanceAccount` | POST | `api/finance/accounts` |
+| `apiUpdateFinanceAccount` | PUT | `api/finance/accounts/{id}` |
+| `apiArchiveFinanceAccount` | DELETE | `api/finance/accounts/{id}` |
+| `apiGetAccountSnapshots` | GET | `api/finance/accounts/{id}/snapshots` |
+| `apiGetFinanceSummary` | GET | `api/finance/summary` |
+
 ## Auth header
 
 `Authorization: Bearer <token>` — `FE/src/services/BaseService.ts`
