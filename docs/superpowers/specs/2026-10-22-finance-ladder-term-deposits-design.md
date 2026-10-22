@@ -1,7 +1,7 @@
 # Finance Ladder / Term Deposits — Design
 
 **Date:** 2026-10-22  
-**Status:** Draft (awaiting user review of written spec)  
+**Status:** Approved  
 **Repos:** SFBE / SFFE / workspace  
 **Depends on:** Phase B Finance Accounts (`2026-10-22-finance-accounts-phase-b-design.md`)  
 **Approach:** A — `TermDeposit` entity linked to `FinanceAccount` (`TermSaving`), with balance sync  
