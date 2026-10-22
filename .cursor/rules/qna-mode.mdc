@@ -1,5 +1,5 @@
 ---
-description: "@QnA | QnA: — read-only Q&A (activates only on these triggers)"
+description: "~QnA | QnA: — read-only Q&A (activates only on these triggers, case-insensitive)"
 alwaysApply: true
 ---
 
@@ -7,21 +7,21 @@ alwaysApply: true
 
 ## Activation gate (read first)
 
-**Apply this rule if and only if** the user message matches **exactly one** of:
+**Apply this rule if and only if** the user message matches **exactly one** of (matching is **case-insensitive**):
 
 | Trigger | Match rule |
 |---------|------------|
 | `QnA:` | Message **starts with** `QnA:` then optional whitespace, then the question |
-| `@QnA` | Message **starts with** `@QnA` then optional whitespace, then the question |
+| `~QnA` | Message **starts with** `~QnA` then optional whitespace, then the question |
 
-Examples that **activate**: `QnA: so sánh X và Y?` · `@QnA junction là gì?`
+Examples that **activate**: `QnA: so sánh X và Y?` · `qna: junction là gì?` · `~QnA junction là gì?` · `~qna so sánh X và Y?`
 
 Examples that **do NOT activate** (ignore this entire file):
 
 - `QnA so sánh...` (missing colon)
-- `qna:` / `@qna` (wrong case — triggers are case-sensitive)
-- `... QnA:` or `@QnA` in the middle/end of message
-- `@qna-mode`, `@qna-mode.mdc`, bare `@` without `QnA`
+- `@QnA ...` / `@qna ...` (old `@` prefix is no longer a trigger)
+- `... QnA:` or `~QnA` in the middle/end of message
+- `@qna-mode`, `@qna-mode.mdc`, bare `~` without `QnA`
 - Any message without one of the two triggers above
 
 **If not activated:** behave as if this rule does not exist. Follow other rules (e.g. sf-fullstack) normally.
