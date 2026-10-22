@@ -1,7 +1,7 @@
 # Finance Accounts (Phase B) — Design
 
 **Date:** 2026-10-22  
-**Status:** Draft (awaiting user review of written spec)  
+**Status:** Approved  
 **Repos:** SFBE / SFFE / workspace  
 **Approach:** A — thin Finance module (`FinanceAccount` + `AccountBalanceSnapshot`)
 
