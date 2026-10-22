@@ -24,6 +24,7 @@ VPS DB setup notes: [POSTGRES-VPS.md](./POSTGRES-VPS.md). Optional alternative: 
 ## BE — modular monolith
 
 - **Account** — JWT, Google OAuth, Identity
+- **Finance** — personal accounts / ladder (see [FINANCE-TERMINOLOGY.md](./FINANCE-TERMINOLOGY.md); design: `docs/superpowers/specs/`)
 - **Instrument** — search, favorites, alerts
 - **Market**, **Crypto** orders/signals
 

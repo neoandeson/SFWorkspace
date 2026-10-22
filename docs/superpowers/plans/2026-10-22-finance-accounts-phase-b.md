@@ -8,7 +8,8 @@
 
 **Tech Stack:** .NET 10, EF Core + PostgreSQL (`LedgerDBContext`), MediatR, FluentValidation, xUnit/Moq/FluentAssertions; React 18 + Vite + Redux toolkit patterns already in SFFE; Axios `ApiService`.
 
-**Spec:** `workspace/docs/superpowers/specs/2026-10-22-finance-accounts-phase-b-design.md`
+**Spec:** `workspace/docs/superpowers/specs/2026-10-22-finance-accounts-phase-b-design.md`  
+**Terminology:** `workspace/docs/FINANCE-TERMINOLOGY.md`
 
 ## Global Constraints
 
@@ -23,6 +24,7 @@
 - Ladder / derived TermSaving / Excel import / broker APIs are out of scope.
 - Backend-first: API + migration → Swagger → FE → update `workspace/docs/API-MAP.md`.
 - Repos: SFBE = `D:\Projects\SF\SFBE`, SFFE = `D:\Projects\SF\SFFE`, docs = `D:\Projects\SF\workspace`. Commit in the repo you change.
+- **Finance wording:** follow `FINANCE-TERMINOLOGY.md`. Excel “Margin” / “%Margin” → API `TotalInterest` / `YieldPercent`, UI **Tổng lãi** / **Tỷ suất lãi**. Never name fields or FE copy “Margin” for deposit interest.
 
 ---
 

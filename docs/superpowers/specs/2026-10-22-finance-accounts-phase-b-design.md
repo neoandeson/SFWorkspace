@@ -3,7 +3,8 @@
 **Date:** 2026-10-22  
 **Status:** Approved  
 **Repos:** SFBE / SFFE / workspace  
-**Approach:** A — thin Finance module (`FinanceAccount` + `AccountBalanceSnapshot`)
+**Approach:** A — thin Finance module (`FinanceAccount` + `AccountBalanceSnapshot`)  
+**Terminology:** [FINANCE-TERMINOLOGY.md](../../FINANCE-TERMINOLOGY.md) (canonical; do not use Excel “Margin” for interest)
 
 ## Goals
 
@@ -32,6 +33,7 @@ Future ladder decisions (not implemented here, but design must not block them):
 - Renewal = close old contract + create new
 - Mid-term: allow editing principal on Open contracts (with snapshots)
 - When a `TermSaving` account has open contracts → balance derived; when none → manual
+- Totals language: **Tổng gốc** / **Tổng lãi** / **Tỷ suất lãi** (`TotalPrincipal` / `TotalInterest` / `YieldPercent`) — never “Margin” / “%Margin”
 
 ## Data model
 
