@@ -9,7 +9,14 @@ alwaysApply: true
 
 - `FE/` — Frontend (React 18, Vite, Redux). Legacy folder: `SFUI/` (same content via junction).
 - `BE/` — Backend (.NET 10 LTS, Clean Architecture). Legacy folder: `SFWeb/`.
+- `SFWebUI/` — New trading research frontend (React 19 + Vite + Tailwind 4 + shadcn/ui + Animate UI + TanStack Table); independent from SFFE while under development.
 - `workspace/` — Docs, API map, scripts, this rule. **Open `SF.code-workspace` here.**
+
+## SFWebUI boundary
+
+- Keep existing EBoard in SFFE unchanged unless a task explicitly scopes migration.
+- Read the supplied Figma frame through Figma MCP when available; map semantic variables to SFWebUI CSS tokens and visually inspect the browser output at target breakpoints.
+- Do not commit or push without user permission.
 
 ## Ports (local)
 

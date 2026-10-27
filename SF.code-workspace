@@ -9,6 +9,10 @@
       "path": "../SFFE"
     },
     {
+      "name": "SFWebUI",
+      "path": "../SFWebUI"
+    },
+    {
       "name": "workspace",
       "path": "."
     }

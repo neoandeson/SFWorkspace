@@ -17,10 +17,14 @@ VPS DB setup notes: [POSTGRES-VPS.md](./POSTGRES-VPS.md). Optional alternative: 
 
 | Path | Role |
 |------|------|
-| `FE/` / `SFFE/` | Frontend repo |
+| `SFFE/` | Existing frontend repo; EBoard layout is a reference for SFWebUI |
+| `SFWebUI/` | New React trading research UI; rebuilds EBoard layout without linking to SFFE |
 | `BE/` / `SFBE/` | Backend repo |
 | `workspace/` | Hub: docs, Cursor rules, scripts |
 
+## SFWebUI — new frontend
+
+SFWebUI is the new user-facing React 19 + Vite + Tailwind CSS 4 application using shadcn/ui, Animate UI and TanStack Table. Recreate EBoard's layout in SFWebUI with a new visual system; do not link users to the old SFFE UI. Keep SFBE and SFFE repositories unchanged. Connect to SFBE through its existing API contracts; the initial EBoard screen uses clearly labeled sample market rows until a market-data contract is integrated.
 ## BE — modular monolith
 
 - **Account** — JWT, Google OAuth, Identity

@@ -1,52 +1,27 @@
-# SF — Fullstack workspace
+# SF Project Workspace
 
-Hub docs, Cursor rules, and scripts for the SF BE + FE repos. **Not** application code.
+Multi-root workspace for the SF backend, current frontend, new trading research UI and shared engineering docs.
 
-Remote: https://github.com/neoandeson/SFWorkspace
-
-## Clone layout (sibling folders)
-
-```powershell
-cd D:\Projects\SF   # or any parent folder
-git clone https://github.com/neoandeson/SFBE.git
-git clone https://github.com/neoandeson/SFFE.git
-git clone https://github.com/neoandeson/SFWorkspace.git workspace
-```
-
-Expected tree:
+## Repositories
 
 ```text
-SF/
-├── SFBE/        → API (.NET)
-├── SFFE/        → Frontend (React/Vite)
-└── workspace/   → this repo (docs, rules, SF.code-workspace)
+D:\Projects\SF\
+├── SFBE/        → .NET API and database
+├── SFFE/        → Existing React frontend, kept intact
+├── SFWebUI/     → New React trading research frontend and rebuilt EBoard UI
+└── workspace/   → Shared docs, Cursor rules, scripts and workspace file
 ```
 
-`SF.code-workspace` references `../SFBE` and `../SFFE` — keep the three folders side by side with these names (or adjust paths in the workspace file).
+`SF.code-workspace` includes the repositories above. Open it with **File → Open Workspace from File**.
 
-## Open in Cursor
+## Frontend boundary
 
-**File → Open Workspace from File** → `workspace/SF.code-workspace`
+SFWebUI is the new user-facing application, built with React 19, Tailwind 4, shadcn/ui, Animate UI and TanStack Table. EBoard's layout in SFFE is a reference; SFWebUI recreates the screen with its own design and routes, without linking users to SFFE. SFBE and SFFE remain unchanged; SFWebUI calls existing SFBE API contracts.
 
-## Local run
+## Shared docs
 
-```powershell
-cd D:\Projects\SF
-.\workspace\scripts\dev.ps1
-```
-
-Or see [docs/WORKFLOW.md](docs/WORKFLOW.md) (native + Docker).
-
-## Docs
-
-- [ARCHITECTURE](docs/ARCHITECTURE.md)
-- [API-MAP](docs/API-MAP.md)
-- [WORKFLOW](docs/WORKFLOW.md)
-- [DEPLOY nginx + Docker](docs/DEPLOY-NGINX-DOCKER.md) — VPS, CI/CD, EF migrations
-
-## Scope
-
-| In this repo | In SFBE / SFFE |
-|--------------|----------------|
-| Docs, plans, Cursor rules | Application source |
-| `SF.code-workspace`, scripts | Dockerfiles, app config |
+- [Architecture](docs/ARCHITECTURE.md)
+- [API map](docs/API-MAP.md)
+- [Workflow](docs/WORKFLOW.md)
+- [SFWebUI decisions](../SFWebUI/docs/DECISIONS.md)
+- [Deploy: nginx + Docker](docs/DEPLOY-NGINX-DOCKER.md)
